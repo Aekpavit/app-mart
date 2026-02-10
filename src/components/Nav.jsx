@@ -15,10 +15,10 @@ const Navbar = () => {
             {["Dashboard", "Products", "About", "Contact"].map((item) => (
               <li
                 key={item}
-                className="relative cursor-pointer transition-colors hover:text-blue-600 group"
+                className="relative cursor-pointer transition-colors hover:text-lime-600 group"
               >
                 {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-blue-600 rounded-full transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-green-600 rounded-full transition-all duration-300 group-hover:w-full"></span>
               </li>
             ))}
           </ul>

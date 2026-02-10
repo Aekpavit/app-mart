@@ -1,9 +1,9 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate()
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -12,6 +12,7 @@ export default function Login() {
       email,
       password,
     });
+    navigate("/")
   };
 
   return (
@@ -22,7 +23,6 @@ export default function Login() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Email
@@ -37,7 +37,6 @@ export default function Login() {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Password
@@ -52,7 +51,7 @@ export default function Login() {
             />
           </div>
 
-          {/* Button */}
+          {}
           <button
             type="submit"
             className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 rounded-lg transition"
