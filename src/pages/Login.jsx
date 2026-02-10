@@ -16,7 +16,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-200">
       <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
         <h1 className="text-2xl font-bold text-center mb-6">
           Login
@@ -29,7 +29,7 @@ export default function Login() {
             </label>
             <input
               type="email"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="example@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -43,8 +43,8 @@ export default function Login() {
             </label>
             <input
               type="password"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              placeholder="********"
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="* * * * * * * * * "
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -54,14 +54,14 @@ export default function Login() {
           {}
           <button
             type="submit"
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 rounded-lg transition"
+            className="w-full bg-blue-500 hover:bg-blue-900 text-white font-semibold py-2 rounded-lg transition"
           >
             Login
           </button>
         </form>
 
         <p className="text-sm text-center mt-4 text-slate-500">
-          ยังไม่มีบัญชี? <span className="text-yellow-500 cursor-pointer">สมัครสมาชิก</span>
+          ยังไม่มีบัญชี? <span className="text-red-400 cursor-pointer">สมัครสมาชิก</span>
         </p>
       </div>
     </div>
