@@ -1,14 +1,15 @@
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 
-import Footer from './components/Footer'
-import Home from './pages/Home'
-import Navbar from './components/Nav'
 
 function App() {
   return (
-    <>  
-      <Home/>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
