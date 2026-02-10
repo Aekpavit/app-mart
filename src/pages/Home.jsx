@@ -19,24 +19,24 @@ export default function Home() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-10">
           <StatCard
             title="ยอดขายวันนี้"
-            value="฿12,450"
+            value="0"
             icon={<MdOutlineAttachMoney />}
             className="from-emerald-400 to-teal-500"
             trend="none"
           />
           <StatCard
             title="ออเดอร์ทั้งหมด"
-            value="48"
+            value="0"
             icon={<MdBorderColor />}
             className="from-blue-400 to-indigo-500"
             trend="none"
           />
           <StatCard
             title="เมนูทั้งหมด"
-            value="105"
+            value="0"
             icon={<VscGraph />}
             className="from-orange-400 to-pink-500"
             trend="none"
@@ -46,7 +46,7 @@ export default function Home() {
         {/* Main Content: Charts & Tables */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
           
-          {/* Left Column: Recent Orders (Table) */}
+          
           <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex justify-between items-center">
               <h2 className="text-xl font-bold text-slate-800">ออเดอร์ล่าสุด</h2>

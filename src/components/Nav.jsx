@@ -1,25 +1,11 @@
 const Navbar = () => {
     return (
       <nav className="fixed top-0 w-full z-50 px-4 py-4">
-        <div
-          className="
-            relative
-            max-w-6xl mx-auto
-            bg-white/10 backdrop-blur-xl
-            border border-black/20
-            rounded-2xl
-            px-10 py-3
-            flex items-center
-            shadow-[0_8px_30px_rgba(0,0,0,0.08)]
-            ring-1 ring-white/40
-          "
-        >
-          {/* Logo (ซ้าย) */}
+        <div className="relative max-w-6xl mx-auto  bg-white/10 backdrop-blur-xl border border-black/20 rounded-2xl px-10 py-3 flex items-center shadow-[0_8px_30px_rgba(0,0,0,0.08)]ring-1 ring-white/40">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/30"></div>
+            <div className="w-20 h-8 ">  {/*อย่าลบตัวค้ำกรุงศรี*/}
+            </div>
           </div>
-  
-          {/* MENU (กลางจริง) */}
           <ul className="
             hidden md:flex
             absolute left-1/2 -translate-x-1/2
