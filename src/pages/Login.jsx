@@ -6,13 +6,13 @@ export default function Login() {
   const navigate = useNavigate()
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     // 🔥 ตรงนี้เอาไปต่อ API ทีหลังได้
     console.log({
       email,
       password,
     });
-    navigate("/")
+    // navigate("/home")
   };
 
   return (
@@ -50,11 +50,12 @@ export default function Login() {
               required
             />
           </div>
-
+            
           {}
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
+            className="w-full bg-blue-500 hover:bg-blue-70 text-white font-semibold py-2 rounded-lg transition"
+            onClick={()=> {navigate("/home")}}
           >
             Login
           </button>
