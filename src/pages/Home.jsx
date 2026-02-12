@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Nav";
 import { VscGraph } from "react-icons/vsc";
-import { MdContentPasteSearch } from "react-icons/md";
 import {
   MdOutlineAttachMoney,
   MdBorderColor,
-  MdMoreTime,
+  MdContentPasteSearch,
 } from "react-icons/md";
 import Footer from "../components/Footer";
+import { MenuContext } from "../context/MenuContext";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { menuCount } = useContext(MenuContext);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 text-gray-900">
@@ -38,9 +39,9 @@ export default function Home() {
           />
           <StatCard
             title="เมนูทั้งหมด"
-            value="0"
+            value={menuCount} // ✅ ใช้ค่าจริงจาก Context
             icon={<VscGraph />}
-            className="from-blue-600 to-blue-700 cursor-pointer"
+            className="from-purple-600 to-purple-700 cursor-pointer"
           />
         </div>
 
