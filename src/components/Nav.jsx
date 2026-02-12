@@ -21,7 +21,7 @@ const Navbar = () => {
             hidden md:flex
             absolute left-1/2 -translate-x-1/2
             items-center gap-8
-            text-sm font-medium text-slate-700
+            font-medium text-slate-700
           "
         >
           {menuItems.map((item) => (
@@ -29,8 +29,11 @@ const Navbar = () => {
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
-                  `relative cursor-pointer transition-colors group
-                  ${isActive ? "text-lime-600" : "hover:text-lime-600"}`
+                  `relative cursor-pointer transition-all duration-300 group
+                  ${isActive 
+                    ? "text-gray-600 font-bold text-sm scale-110" 
+                    : "hover:text-gray-600 text-sm"
+                  }`
                 }
               >
                 {item.name}
