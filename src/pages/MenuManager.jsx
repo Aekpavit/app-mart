@@ -36,7 +36,6 @@ export default function EditMenu() {
     try {
       const res = await api.get("api/menu");
       setMenus(res.data);
-      setMenuCount(res.data.length); 
     } catch (err) {
       console.error("Fetch failed", err);
     } finally {
@@ -59,19 +58,40 @@ export default function EditMenu() {
 
   const handleSave = async () => {
     if (!selectedMenu) return;
+  
     setIsSaving(true);
+  
     try {
-      console.log("Saving ID:", selectedMenu.id_menu, formData);
-      // ตรงนี้ต้องเขียน logic ส่ง formData.file ไป API ด้วยนะครับ (ใช้ FormData object)
-      await new Promise((resolve) => setTimeout(resolve, 800)); 
-      alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+      if (formData.file) {
+
+        const data = new FormData();
+        data.append("name", formData.name);
+        data.append("price", formData.price);
+        data.append("image", formData.file);
+  
+        await api.put(`api/menu/${selectedMenu.id_menu}`, data, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+  
+      } else {
+        // 🔥 ไม่มีรูปใหม่ → ส่ง JSON ปกติ
+        await api.put(`api/menu/${selectedMenu.id_menu}`, {
+          name: formData.name,
+          price: formData.price
+        });
+      }
+  
+      alert("บันทึกสำเร็จ 🔥");
+      fetchMenu(); // รีโหลดรายการใหม่
+  
     } catch (err) {
-      console.error("Save failed", err);
-      alert("เกิดข้อผิดพลาดในการบันทึก");
+      console.error("Update failed", err);
+      alert("เกิดข้อผิดพลาด");
     } finally {
       setIsSaving(false);
     }
   };
+  
 
   const handleDelete = async () => {
     if (!selectedMenu) return;
@@ -79,7 +99,6 @@ export default function EditMenu() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
       setMenus(menus.filter((m) => m.id_menu !== selectedMenu.id_menu));
-      setMenuCount(menus.length - 1); // ✅ อัพเดท context หลังลบ
       setSelectedMenu(null);
       alert("ลบข้อมูลสำเร็จ");
     } catch (err) {
@@ -133,7 +152,7 @@ export default function EditMenu() {
                       }`}
                     >
                       <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100 mb-1">
-                        <img src={`${BASE_URL}${item.img}`} className="w-full h-full object-cover" alt="menu" />
+                        <img src={`${BASE_URL}${item.img}`} className="w-full h-full object-scale-down" alt="menu" />
                       </div>
                       <p className="text-[9px] font-bold text-gray-800 truncate w-full text-center">{item.name_menu}</p>
                       <p className="text-[9px] font-medium text-gray-600">฿{item.price_menu}</p>
@@ -167,7 +186,7 @@ export default function EditMenu() {
                       >
                         <img 
                           src={imgPreview || `${BASE_URL}${selectedMenu.img}`} 
-                          className="w-full h-full object-cover transition-all duration-500 group-hover:blur-sm group-hover:scale-110" 
+                          className="w-full h-full object-scale-down transition-all duration-500 group-hover:blur-sm group-hover:scale-110" 
                           alt="preview" 
                         />
                         
