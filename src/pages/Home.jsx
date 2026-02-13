@@ -21,7 +21,7 @@ export default function Home() {
       <div className="max-w-[1400px] mx-auto p-4 md:p-8">
         <div className="mt-16 mb-10 flex flex-col items-center">
           <h1 className="text-2xl text-gray-600 font-bold ">
-            สวัสดี user ยินดีต้อนรับ !!
+            สวัสดีuserยินดีต้อนรับ !!
           </h1>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 ">
@@ -29,25 +29,22 @@ export default function Home() {
             title="ยอดขายวันนี้"
             value="0"
             icon={<MdOutlineAttachMoney />}
-            className="from-emerald-500 to-emerald-600 cursor-pointer"
+            className="from-emerald-500 to-emerald-600 cursor-pointer hover:shadow-2xl"
           />
           <StatCard
             title="ออเดอร์ทั้งหมด"
             value="0"
             icon={<MdBorderColor />}
-            className="from-blue-600 to-blue-700 cursor-pointer"
+            className="from-blue-600 to-blue-700 cursor-pointer hover:shadow-2xl"
           />
           <StatCard
             title="เมนูทั้งหมด"
-            value={menuCount} // ✅ ใช้ค่าจริงจาก Context
+            value={menuCount}
             icon={<VscGraph />}
-            className="from-purple-600 to-purple-700 cursor-pointer"
+            className="from-purple-600 to-purple-700 cursor-pointer hover:shadow-2xl"
           />
         </div>
-
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
-          {/* Table */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-400/40 overflow-hidden">
             <div className="p-6 border-b border-gray-300 flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">
@@ -87,8 +84,6 @@ export default function Home() {
               </table>
             </div>
           </div>
-
-          {/* Right Column */}
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-400/40">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">

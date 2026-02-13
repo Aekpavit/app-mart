@@ -4,6 +4,7 @@ import Navbar from "../components/Nav";
 import { FaSearch, FaCamera } from "react-icons/fa";
 import { useContext } from "react";
 import { MenuContext } from "../context/MenuContext";
+import Swal from "sweetalert2";
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function EditMenu() {
@@ -74,37 +75,46 @@ export default function EditMenu() {
         });
   
       } else {
-        // 🔥 ไม่มีรูปใหม่ → ส่ง JSON ปกติ
+        
         await api.put(`api/menu/${selectedMenu.id_menu}`, {
           name: formData.name,
           price: formData.price
         });
       }
-  
-      alert("บันทึกสำเร็จ 🔥");
-      fetchMenu(); // รีโหลดรายการใหม่
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "บันทึกสำเร็จ",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        showClass: {
+          popup: "animate__animated animate__fadeInRight"
+        },
+        hideClass: {
+          popup: "animate__animated animate__fadeOutRight"
+        }
+      });
+      fetchMenu(); 
   
     } catch (err) {
       console.error("Update failed", err);
-      alert("เกิดข้อผิดพลาด");
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true
+      });
+      
     } finally {
       setIsSaving(false);
     }
   };
   
-
-  const handleDelete = async () => {
-    if (!selectedMenu) return;
-    if (!confirm(`คุณต้องการลบเมนู "${selectedMenu.name_menu}" ใช่หรือไม่?`)) return;
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setMenus(menus.filter((m) => m.id_menu !== selectedMenu.id_menu));
-      setSelectedMenu(null);
-      alert("ลบข้อมูลสำเร็จ");
-    } catch (err) {
-      console.error("Delete failed", err);
-    }
-  };
 
   const filteredMenu = menus.filter((item) =>
     item.name_menu.toLowerCase().includes(search.toLowerCase())
@@ -116,8 +126,6 @@ export default function EditMenu() {
 
       <main className="pt-24 pb-6 px-4 lg:px-8 max-w-[1600px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
-          
-          {/* Left Panel */}
           <div className="lg:col-span-1 bg-white rounded-3xl shadow-sm border border-gray-300 flex flex-col overflow-hidden">
             <div className="p-4 border-b border-gray-100">
               <div className="relative mb-2">
@@ -163,7 +171,7 @@ export default function EditMenu() {
             </div>
           </div>
 
-          {/* Right Panel */}
+          {/* ซักที่ */}
           <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-300 overflow-hidden h-full">
             {selectedMenu ? (
               <div className="h-full flex flex-col">
@@ -178,7 +186,7 @@ export default function EditMenu() {
                 <div className="flex-1 p-6 flex items-center justify-center overflow-hidden bg-gray-50/30">
                   <div className="w-full max-w-2xl grid grid-cols-5 gap-8 items-center">
                     
-                    {/* --- ส่วนรูปภาพ --- */}
+                    {/* --- รูบพาพ --- */}
                     <div className="col-span-2 space-y-2">
                       <div 
                         onClick={handleImageClick}
