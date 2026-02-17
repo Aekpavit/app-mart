@@ -4,9 +4,11 @@ import Navbar from "../components/Nav";
 import { VscGraph } from "react-icons/vsc";
 import {
   MdOutlineAttachMoney,
-  MdBorderColor,
+  MdOutlineMenuBook,
   MdContentPasteSearch,
+  MdOutlineRestaurantMenu,
 } from "react-icons/md";
+import { BsCalendar2Check } from "react-icons/bs";
 import Footer from "../components/Footer";
 import { MenuContext } from "../context/MenuContext";
 
@@ -34,13 +36,13 @@ export default function Home() {
           <StatCard
             title="ออเดอร์ทั้งหมด"
             value="0"
-            icon={<MdBorderColor />}
+            icon={<BsCalendar2Check />}
             className="from-blue-600 to-blue-700 cursor-pointer hover:shadow-2xl"
           />
           <StatCard
             title="เมนูทั้งหมด"
             value={menuCount}
-            icon={<VscGraph />}
+            icon={<MdOutlineMenuBook />}
             className="from-purple-600 to-purple-700 cursor-pointer hover:shadow-2xl"
           />
         </div>

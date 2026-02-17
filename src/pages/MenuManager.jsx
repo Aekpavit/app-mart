@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import api from "/app1/app-mart/api/axios";
 import Navbar from "../components/Nav";
 import { FaSearch, FaCamera } from "react-icons/fa";
+import { BsBookmarkCheckFill } from "react-icons/bs";
 import { useContext } from "react";
 import { MenuContext } from "../context/MenuContext";
 import Swal from "sweetalert2";
@@ -12,11 +13,23 @@ export default function EditMenu() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState(null);
-  const [formData, setFormData] = useState({ name: "", price: "", file: null });
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    file: null,
+    type: "",
+  });
   const [imgPreview, setImgPreview] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const { setMenuCount } = useContext(MenuContext);
   const fileInputRef = useRef(null);
+
+  {/* ✅ แทนที่ <select> เดิมทั้งหมด */}
+const typeOptions = [
+  { value: "food",    label: "อาหาร",      icon: <BsBookmarkCheckFill /> },
+  { value: "drink",   label: "เครื่องดื่ม", icon: <BsBookmarkCheckFill /> },
+  { value: "dessert", label: "ของหวาน",    icon:<BsBookmarkCheckFill /> },
+];
 
   useEffect(() => {
     fetchMenu();
@@ -27,11 +40,19 @@ export default function EditMenu() {
       setFormData({
         name: selectedMenu.name_menu,
         price: selectedMenu.price_menu,
-        file: null
+        file: null,
+        type: selectedMenu.type || "",
       });
       setImgPreview(null);
     }
   }, [selectedMenu]);
+
+  // ✅ แก้ memory leak — revokeObjectURL เมื่อ imgPreview เปลี่ยน
+  useEffect(() => {
+    return () => {
+      if (imgPreview) URL.revokeObjectURL(imgPreview);
+    };
+  }, [imgPreview]);
 
   const fetchMenu = async () => {
     try {
@@ -59,40 +80,39 @@ export default function EditMenu() {
 
   const handleSave = async () => {
     if (!selectedMenu) return;
-  
+
     setIsSaving(true);
-  
+
     try {
       const data = new FormData();
+
       data.append("name", formData.name);
       data.append("price", formData.price);
-  
+      data.append("type", formData.type);
+
       if (formData.file) {
         data.append("img", formData.file);
       }
-  
-      const res = await api.put(
-        `api/menu/${selectedMenu.id_menu}`,
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data" //หน่อแตรดแก้ไป 2 ช.ม แค่บรรทัดเดียว
-          }
-        }
-      );
-  
-      setSelectedMenu(prev => ({
+
+      const res = await api.put(`api/menu/${selectedMenu.id_menu}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setSelectedMenu((prev) => ({
         ...prev,
         name_menu: formData.name,
         price_menu: formData.price,
-        img: res.data.img ? res.data.img : prev.img
+        type: formData.type,
+        img: res.data.img ? res.data.img : prev.img,
       }));
-  
+
       setImgPreview(null);
-      setFormData(prev => ({ ...prev, file: null }));
-  
+      setFormData((prev) => ({ ...prev, file: null }));
+
       await fetchMenu();
-  
+
       Swal.fire({
         toast: true,
         position: "top-end",
@@ -101,15 +121,13 @@ export default function EditMenu() {
         showConfirmButton: false,
         timer: 2000,
       });
-  
     } catch (err) {
       console.error(err);
+      Swal.fire("ผิดพลาด", "บันทึกไม่สำเร็จ", "error");
     } finally {
       setIsSaving(false);
     }
   };
-  
-  
 
   const filteredMenu = menus.filter((item) =>
     item.name_menu.toLowerCase().includes(search.toLowerCase())
@@ -131,17 +149,25 @@ export default function EditMenu() {
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-gray-200 rounded-xl focus:bg-gray-300 outline-none transition-all text-sm"
                 />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><FaSearch /></span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <FaSearch />
+                </span>
               </div>
               <div className="flex justify-between items-center px-1">
-                <span className="text-[10px] font-bold text-gray-400 pl-3 uppercase">Menu List</span>
-                <span className="text-[10px]  text-gray-600 bg-blue-50 px-3 py-0.5 rounded-md">จำนวนเมนู: {filteredMenu.length}</span>
+                <span className="text-[10px] font-bold text-gray-400 pl-3 uppercase">
+                  Menu List
+                </span>
+                <span className="text-[10px] text-gray-600 bg-blue-50 px-3 py-0.5 rounded-md">
+                  จำนวนเมนู: {filteredMenu.length}
+                </span>
               </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
               {loading ? (
-                <div className="flex justify-center py-10"><div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div></div>
+                <div className="flex justify-center py-10">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
               ) : (
                 <div className="grid grid-cols-4 gap-2">
                   {filteredMenu.map((item) => (
@@ -155,10 +181,18 @@ export default function EditMenu() {
                       }`}
                     >
                       <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100 mb-1">
-                        <img src={`${BASE_URL}${item.img}`} className="w-full h-full object-scale-down" alt="menu" />
+                        <img
+                          src={`${BASE_URL}${item.img}`}
+                          className="w-full h-full object-scale-down"
+                          alt="menu"
+                        />
                       </div>
-                      <p className="text-[9px] font-bold text-gray-800 truncate w-full text-center">{item.name_menu}</p>
-                      <p className="text-[9px] font-medium text-gray-600">฿{item.price_menu}</p>
+                      <p className="text-[9px] font-bold text-gray-800 truncate w-full text-center">
+                        {item.name_menu}
+                      </p>
+                      <p className="text-[9px] font-medium text-gray-600">
+                        ฿{item.price_menu}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -166,67 +200,109 @@ export default function EditMenu() {
             </div>
           </div>
 
-          {/* ซักที่ */}
           <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-300 overflow-hidden h-full">
             {selectedMenu ? (
               <div className="h-full flex flex-col">
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center shrink-0">
                   <div>
-                    <h2 className="text-lg font-black text-gray-900 leading-none">แก้ไขข้อมูล</h2>
-                    <p className="text-[10px] text-gray-400 uppercase font-bold mt-1">ID: {selectedMenu.id_menu}</p>
+                    <h2 className="text-lg font-black text-gray-900 leading-none">
+                      แก้ไขข้อมูล
+                    </h2>
+                    
                   </div>
-                  <button onClick={() => setSelectedMenu(null)} className="text-gray-400 hover:text-red-500 font-bold">✕</button>
+                  <button
+                    onClick={() => setSelectedMenu(null)}
+                    className="text-gray-400 hover:text-red-500 font-bold"
+                  >
+                    ✕
+                  </button>
                 </div>
 
                 <div className="flex-1 p-6 flex items-center justify-center overflow-hidden bg-gray-50/30">
                   <div className="w-full max-w-2xl grid grid-cols-5 gap-8 items-center">
-                    
-                    {/* --- รูบพาพ --- */}
+                    {/* รูปภาพ */}
                     <div className="col-span-2 space-y-2">
-                      <div 
+                      <div
                         onClick={handleImageClick}
                         className="relative group aspect-square rounded-3xl overflow-hidden shadow-lg border-4 border-white cursor-pointer bg-gray-100"
                       >
-                        <img 
-                          src={imgPreview || `${BASE_URL}${selectedMenu.img}`} 
-                          className="w-full h-full object-scale-down transition-all duration-500 group-hover:blur-sm group-hover:scale-110" 
-                          alt="preview" 
+                        <img
+                          src={imgPreview || `${BASE_URL}${selectedMenu.img}`}
+                          className="w-full h-full object-scale-down transition-all duration-500 group-hover:blur-sm group-hover:scale-110"
+                          alt="preview"
                         />
-                        
                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white">
                           <FaCamera className="text-3xl mb-1 drop-shadow-md" />
-                          <span className="text-xs font-bold drop-shadow-md">เปลี่ยนรูป</span>
+                          <span className="text-xs font-bold drop-shadow-md">
+                            เปลี่ยนรูป
+                          </span>
                         </div>
-
-                        <input 
-                          type="file" 
+                        <input
+                          type="file"
                           ref={fileInputRef}
                           onChange={handleFileChange}
                           accept="image/*"
-                          className="hidden" 
+                          className="hidden"
                         />
                       </div>
-                      <p className="text-[10px] text-center text-gray-400 font-bold animate-pulse ">คลิกที่รูปเพื่อเปลี่ยน</p>
+                      <p className="text-[10px] text-center text-gray-400 font-bold animate-pulse">
+                        คลิกที่รูปเพื่อเปลี่ยน
+                      </p>
                     </div>
 
                     <div className="col-span-3 space-y-5">
+                      {/* ชื่ออา/ */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-gray-400 uppercase ml-1">ชื่อรายการอาหาร</label>
+                        <label className="text-[11px] font-black text-gray-400 uppercase ml-1">
+                          ชื่อรายการอาหาร
+                        </label>
                         <input
                           type="text"
                           value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
                           className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl focus:border-blue-500 outline-none transition-all font-bold"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-gray-400 uppercase ml-1">ราคา (บาท)</label>
+                        <label className="text-[11px] font-black text-gray-400 uppercase ml-1">
+                          ประเภทเมนู
+                        </label>
+                        <div className="flex gap-2">
+                          {typeOptions.map((opt) => (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() =>
+                                setFormData({ ...formData, type: opt.value })
+                              }
+                              className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-2xl border-2 transition-all font-bold text-sm
+                              ${formData.type === opt.value? "border-blue-500 bg-blue-50 text-blue-600": "border-gray-200 bg-white text-gray-400 hover:border-gray-300"}`}
+                            >
+                              <span className="text-xl">{opt.icon}</span>
+                              <span className="text-[11px]">{opt.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-black text-gray-400 uppercase ml-1">
+                          ราคา (บาท)
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">฿</span>
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">
+                            ฿
+                          </span>
                           <input
                             type="number"
                             value={formData.price}
-                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                price: e.target.value,
+                              })
+                            }
                             className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-2xl focus:border-blue-500 outline-none transition-all font-bold text-gray-600"
                           />
                         </div>
@@ -247,15 +323,17 @@ export default function EditMenu() {
               </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center p-12">
-                <div className="text-5xl mb-4 opacity-20 animate-bounce" >?</div>
-                <p className="text-gray-400 font-bold">เลือกเมนูจากด้านซ้ายเพื่อแก้ไข</p>
+                <div className="text-5xl mb-4 opacity-20 animate-bounce">?</div>
+                <p className="text-gray-400 font-bold">
+                  เลือกเมนูจากด้านซ้ายเพื่อแก้ไข
+                </p>
               </div>
             )}
           </div>
         </div>
       </main>
 
-      <style >{`
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
       `}</style>
