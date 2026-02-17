@@ -63,57 +63,52 @@ export default function EditMenu() {
     setIsSaving(true);
   
     try {
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("price", formData.price);
+  
       if (formData.file) {
-
-        const data = new FormData();
-        data.append("name", formData.name);
-        data.append("price", formData.price);
-        data.append("image", formData.file);
-  
-        await api.put(`api/menu/${selectedMenu.id_menu}`, data, {
-          headers: { "Content-Type": "multipart/form-data" }
-        });
-  
-      } else {
-        
-        await api.put(`api/menu/${selectedMenu.id_menu}`, {
-          name: formData.name,
-          price: formData.price
-        });
+        data.append("img", formData.file);
       }
+  
+      const res = await api.put(
+        `api/menu/${selectedMenu.id_menu}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data" //หน่อแตรดแก้ไป 2 ช.ม แค่บรรทัดเดียว
+          }
+        }
+      );
+  
+      setSelectedMenu(prev => ({
+        ...prev,
+        name_menu: formData.name,
+        price_menu: formData.price,
+        img: res.data.img ? res.data.img : prev.img
+      }));
+  
+      setImgPreview(null);
+      setFormData(prev => ({ ...prev, file: null }));
+  
+      await fetchMenu();
+  
       Swal.fire({
         toast: true,
         position: "top-end",
         icon: "success",
         title: "บันทึกสำเร็จ",
         showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-        showClass: {
-          popup: "animate__animated animate__fadeInRight"
-        },
-        hideClass: {
-          popup: "animate__animated animate__fadeOutRight"
-        }
+        timer: 2000,
       });
-      fetchMenu(); 
   
     } catch (err) {
-      console.error("Update failed", err);
-      Swal.fire({
-        toast: true,
-        position: "top-end",
-        icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true
-      });
-      
+      console.error(err);
     } finally {
       setIsSaving(false);
     }
   };
+  
   
 
   const filteredMenu = menus.filter((item) =>
@@ -260,7 +255,7 @@ export default function EditMenu() {
         </div>
       </main>
 
-      <style jsx>{`
+      <style >{`
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
       `}</style>
