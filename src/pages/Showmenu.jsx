@@ -9,13 +9,13 @@ import { RiDrinks2Fill } from "react-icons/ri";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-// สร้าง axios instance
+//axios instance
 const apiClient = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
-  },
+  }
 });
 
 const CATEGORIES = [

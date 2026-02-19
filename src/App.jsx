@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Showmenu from "./pages/Showmenu";
 import MenuManager from "./pages/MenuManager";
+import AddMenu from "./pages/Addmenu";
+
 
 
 function App() {
@@ -14,6 +16,8 @@ function App() {
       <Route path="/showmenu" element={<Showmenu/>} />
       <Route path="/home" element={<Home/>} />
       <Route path="/menu" element={<MenuManager/>} />
+      <Route path="/Addmenu" element={<AddMenu/>} />
+      
     </Routes>
   );
 }

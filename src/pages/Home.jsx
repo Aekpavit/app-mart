@@ -31,19 +31,20 @@ export default function Home() {
             title="ยอดขายวันนี้"
             value="0"
             icon={<MdOutlineAttachMoney />}
-            className="from-emerald-500 to-emerald-600 cursor-pointer hover:shadow-2xl"
+            className="from-emerald-500 to-emerald-600"
           />
           <StatCard
             title="ออเดอร์ทั้งหมด"
             value="0"
             icon={<BsCalendar2Check />}
-            className="from-blue-600 to-blue-700 cursor-pointer hover:shadow-2xl"
+            className="from-blue-600 to-blue-700"
           />
           <StatCard
             title="เมนูทั้งหมด"
             value={menuCount}
             icon={<MdOutlineMenuBook />}
-            className="from-purple-600 to-purple-700 cursor-pointer hover:shadow-2xl"
+            className="from-purple-600 to-purple-700"
+            onClick={() => navigate('/showmenu')}
           />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
@@ -118,24 +119,36 @@ export default function Home() {
   );
 }
 
-function StatCard({ title, value, icon, className }) {
+function StatCard({ title, value, icon, className, onClick }) {
+  const content = (
+    <div className={`bg-gradient-to-br ${className} p-6 rounded-2xl text-white`}>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium opacity-90">{title}</p>
+        <span className="text-xl bg-white/20 p-2 rounded-md">
+          {icon}
+        </span>
+      </div>
+      <h3 className="text-2xl font-bold mt-4">{value}</h3>
+    </div>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        onClick={onClick}
+        className="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 transition shadow-sm hover:shadow-md cursor-pointer hover:shadow-2xl active:scale-95 w-full text-left"
+      >
+        {content}
+      </button>
+    );
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 transition shadow-sm hover:shadow-md">
-      <div
-        className={`bg-gradient-to-br ${className} p-6 rounded-2xl text-white`}
-      >
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium opacity-90">{title}</p>
-          <span className="text-xl bg-white/20 p-2 rounded-md">
-            {icon}
-          </span>
-        </div>
-        <h3 className="text-2xl font-bold mt-4">{value}</h3>
-      </div>
+      {content}
     </div>
   );
 }
-
 function OrderRow({ name, time, price, status, statusColor }) {
   return (
     <tr className="hover:bg-gray-50 transition">
