@@ -16,7 +16,7 @@ function App() {
       <Route path="/showmenu" element={<Showmenu/>} />
       <Route path="/home" element={<Home/>} />
       <Route path="/menu" element={<MenuManager/>} />
-      <Route path="/Addmenu" element={<AddMenu/>} />
+      <Route path="/addmenu" element={<AddMenu/>} />
       
     </Routes>
   );

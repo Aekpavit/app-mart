@@ -59,7 +59,7 @@ function ImagePreviewModal({ images, currentIndex, onClose, onRemove, onNavigate
             ลบรูปนี้
           </button>
 
-          {/* Navigation */}
+          {/* Navigation - จะแสดงเฉพาะเมื่อมีรูปมากกว่า 1 รูป */}
           {images.length > 1 && (
             <>
               <button
@@ -94,8 +94,8 @@ export default function AddMenu() {
   const fileInputRef = useRef(null);
   
   const [formData, setFormData] = useState({
-    name_menu: "",
-    price_menu: "",
+    name: "",
+    price: "",
     type: "food",
     des: ""
   });
@@ -112,19 +112,21 @@ export default function AddMenu() {
   };
 
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
+    const file = e.target.files[0];
     
-    if (files.length + images.length > 10) {
-      setError("สามารถอัปโหลดได้สูงสุด 10 รูปภาพ");
-      return;
+    if (!file) return;
+
+    // ถ้ามีรูปอยู่แล้วให้ revoke URL เก่า
+    if (images.length > 0) {
+      URL.revokeObjectURL(images[0].preview);
     }
 
-    const newImages = files.map(file => ({
+    const newImage = {
       file,
-      preview: URL.createObjectURL(file)
-    }));
+      preview: URL.createObjectURL(file),
+    };
 
-    setImages(prev => [...prev, ...newImages]);
+    setImages([newImage]);
     setError(null);
   };
 
@@ -152,16 +154,16 @@ export default function AddMenu() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.name_menu.trim()) {
+    if (!formData.name.trim()) {
       setError("กรุณากรอกชื่อเมนู");
       return;
     }
-    if (!formData.price_menu || formData.price_menu <= 0) {
+    if (!formData.price || formData.price <= 0) {
       setError("กรุณากรอกราคาที่ถูกต้อง");
       return;
     }
     if (images.length === 0) {
-      setError("กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป");
+      setError("กรุณาอัปโหลดรูปภาพ");
       return;
     }
 
@@ -170,38 +172,39 @@ export default function AddMenu() {
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('name_menu', formData.name_menu);
-      formDataToSend.append('price_menu', formData.price_menu);
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('price', formData.price);
       formDataToSend.append('type', formData.type);
       formDataToSend.append('des', formData.des);
       
-      // เพิ่มรูปภาพทั้งหมด
-      images.forEach((image) => {
-        formDataToSend.append('images', image.file);
-      });
+      // เพิ่มรูปภาพเดียว field name = 'img'
+      if (images.length > 0) {
+        formDataToSend.append('img', images[0].file);
+      }
 
-      await apiClient.post('api/menu', formDataToSend);
+      const response = await apiClient.post('api/menu', formDataToSend);
+      console.log('Response:', response.data);
       
       setSuccess(true);
       setTimeout(() => {
-        navigate('/show-menu');
+        navigate('/showmenu');
       }, 1500);
       
     } catch (err) {
       console.error("Submit failed:", err);
-      setError(err.response?.data?.message || "เกิดข้อผิดพลาดในการเพิ่มเมนู");
+      setError(err.response?.data?.error || err.response?.data?.message || "เกิดข้อผิดพลาดในการเพิ่มเมนู");
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    if (images.length > 0 || formData.name_menu || formData.price_menu || formData.des) {
+    if (images.length > 0 || formData.name || formData.price || formData.des) {
       if (window.confirm("ยกเลิกการเพิ่มเมนู? ข้อมูลที่กรอกจะหายไป")) {
-        navigate('/show-menu');
+        navigate('/showmenu');
       }
     } else {
-      navigate('/show-menu');
+      navigate('/showmenu');
     }
   };
 
@@ -248,58 +251,48 @@ export default function AddMenu() {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                multiple
                 onChange={handleImageUpload}
                 className="hidden"
               />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={images.length >= 10}
-                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl hover:border-black transition-all bg-gray-50 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl hover:border-black transition-all bg-gray-50 hover:bg-gray-100"
               >
                 <div className="flex flex-col items-center gap-2 text-gray-500">
                   <FaPlus size={24} />
                   <span className="text-sm font-bold">
-                    {images.length === 0 ? "คลิกเพื่ออัปโหลดรูปภาพ" : `อัปโหลดเพิ่ม (${images.length}/10)`}
+                    {images.length === 0 ? "คลิกเพื่ออัปโหลดรูปภาพ" : "เปลี่ยนรูปภาพ"}
                   </span>
-                  <span className="text-xs text-gray-400">รองรับไฟล์ JPG, PNG (สูงสุด 10 รูป)</span>
+                  <span className="text-xs text-gray-400">รองรับไฟล์ JPG, PNG</span>
                 </div>
               </button>
             </div>
 
-            {/* Image Grid */}
+            {/* Image Preview */}
             {images.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {images.map((image, index) => (
-                  <div
-                    key={index}
-                    className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden group cursor-pointer"
-                    onClick={() => setPreviewIndex(index)}
+              <div className="flex justify-center">
+                <div
+                  className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden group cursor-pointer w-48"
+                  onClick={() => setPreviewIndex(0)}
+                >
+                  <img
+                    src={images[0].preview}
+                    alt="Upload preview"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeImage(0);
+                    }}
+                    className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-lg opacity-0 group-hover:opacity-100 transition-all"
                   >
-                    <img
-                      src={image.preview}
-                      alt={`Upload ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all" />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeImage(index);
-                      }}
-                      className="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-lg opacity-0 group-hover:opacity-100 transition-all"
-                    >
-                      <FaTimes size={11} />
-                    </button>
-                    {index === 0 && (
-                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 rounded-full text-white text-[10px] font-bold">
-                        หลัก
-                      </div>
-                    )}
-                  </div>
-                ))}
+                    <FaTimes size={12} />
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -332,14 +325,14 @@ export default function AddMenu() {
 
             {/* Name */}
             <div className="mb-5">
-              <label htmlFor="name_menu" className="block text-sm font-bold text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">
                 ชื่อเมนู <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                id="name_menu"
-                name="name_menu"
-                value={formData.name_menu}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 placeholder="เช่น ผัดไทย, ชาเย็น, ขนมเค้ก..."
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium outline-none focus:border-black focus:bg-white transition-all"
@@ -349,14 +342,14 @@ export default function AddMenu() {
 
             {/* Price */}
             <div className="mb-5">
-              <label htmlFor="price_menu" className="block text-sm font-bold text-gray-700 mb-2">
+              <label htmlFor="price" className="block text-sm font-bold text-gray-700 mb-2">
                 ราคา (฿) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
-                id="price_menu"
-                name="price_menu"
-                value={formData.price_menu}
+                id="price"
+                name="price"
+                value={formData.price}
                 onChange={handleInputChange}
                 placeholder="0.00"
                 min="0"
@@ -384,7 +377,7 @@ export default function AddMenu() {
           </div>
 
           {/* Preview Card */}
-          {(formData.name_menu || formData.price_menu || images.length > 0) && (
+          {(formData.name || formData.price || images.length > 0) && (
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-lg font-black text-gray-900 mb-4">ตัวอย่างการแสดงผล</h2>
               
@@ -403,11 +396,6 @@ export default function AddMenu() {
                         <span className="text-sm">{selectedCategory.icon}</span>
                         <span>{selectedCategory.label}</span>
                       </div>
-                      {images.length > 1 && (
-                        <div className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-black/70 text-white text-[10px] font-bold">
-                          +{images.length - 1}
-                        </div>
-                      )}
                     </>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -419,10 +407,10 @@ export default function AddMenu() {
                 {/* Info */}
                 <div className="p-3">
                   <p className="text-xs font-bold text-gray-800 truncate">
-                    {formData.name_menu || "ชื่อเมนู"}
+                    {formData.name || "ชื่อเมนู"}
                   </p>
                   <p className="text-sm font-black text-black mt-0.5">
-                    ฿{formData.price_menu || "0.00"}
+                    ฿{formData.price || "0.00"}
                   </p>
                 </div>
               </div>

@@ -44,7 +44,7 @@ export default function Home() {
             value={menuCount}
             icon={<MdOutlineMenuBook />}
             className="from-purple-600 to-purple-700"
-            onClick={() => navigate('/showmenu')}
+            onClick={() => navigate("/showmenu")}
           />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
@@ -90,11 +90,15 @@ export default function Home() {
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-400/40">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                <MdContentPasteSearch className="text-stone-600" /> ทางลัดจัดการร้าน
+                <MdContentPasteSearch className="text-stone-600" />{" "}
+                ทางลัดจัดการร้าน
               </h3>
 
               <div className="grid gap-3">
-                <button className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition text-sm font-medium shadow-sm">
+                <button
+                  onClick={() => navigate("/addmenu")}
+                  className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition text-sm font-medium shadow-sm"
+                >
                   เพิ่มเมนูใหม่
                 </button>
 
@@ -102,11 +106,11 @@ export default function Home() {
                   onClick={() => navigate("/menu")}
                   className="w-full py-3 bg-blue-600 hover:bg-blue-800 text-white rounded-lg transition text-sm font-medium shadow-sm"
                 >
-                   แก้ไขเมนู
+                  แก้ไขเมนู
                 </button>
 
                 <button className="w-full py-3 bg-yellow-700/60 hover:bg-yellow-700/70 text-white rounded-lg transition text-sm font-medium">
-                   จัดการระบบร้าน
+                  จัดการระบบร้าน
                 </button>
               </div>
             </div>
@@ -121,12 +125,12 @@ export default function Home() {
 
 function StatCard({ title, value, icon, className, onClick }) {
   const content = (
-    <div className={`bg-gradient-to-br ${className} p-6 rounded-2xl text-white`}>
+    <div
+      className={`bg-gradient-to-br ${className} p-6 rounded-2xl text-white`}
+    >
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium opacity-90">{title}</p>
-        <span className="text-xl bg-white/20 p-2 rounded-md">
-          {icon}
-        </span>
+        <span className="text-xl bg-white/20 p-2 rounded-md">{icon}</span>
       </div>
       <h3 className="text-2xl font-bold mt-4">{value}</h3>
     </div>
