@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import api from "/app1/app-mart/api/axios";
 import Navbar from "../components/Nav";
-import { FaSearch, FaCamera } from "react-icons/fa";
+import { FaSearch, FaCamera, FaTrash } from "react-icons/fa";
 import { BsBookmarkCheckFill } from "react-icons/bs";
 import { useContext } from "react";
 import { MenuContext } from "../context/MenuContext";
@@ -21,15 +21,15 @@ export default function EditMenu() {
   });
   const [imgPreview, setImgPreview] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { setMenuCount } = useContext(MenuContext);
   const fileInputRef = useRef(null);
 
-  {/* ✅ แทนที่ <select> เดิมทั้งหมด */}
-const typeOptions = [
-  { value: "food",    label: "อาหาร",      icon: <BsBookmarkCheckFill /> },
-  { value: "drink",   label: "เครื่องดื่ม", icon: <BsBookmarkCheckFill /> },
-  { value: "dessert", label: "ของหวาน",    icon:<BsBookmarkCheckFill /> },
-];
+  const typeOptions = [
+    { value: "food", label: "อาหาร", icon: <BsBookmarkCheckFill /> },
+    { value: "drink", label: "เครื่องดื่ม", icon: <BsBookmarkCheckFill /> },
+    { value: "dessert", label: "ของหวาน", icon: <BsBookmarkCheckFill /> },
+  ];
 
   useEffect(() => {
     fetchMenu();
@@ -47,7 +47,6 @@ const typeOptions = [
     }
   }, [selectedMenu]);
 
-  // ✅ แก้ memory leak — revokeObjectURL เมื่อ imgPreview เปลี่ยน
   useEffect(() => {
     return () => {
       if (imgPreview) URL.revokeObjectURL(imgPreview);
@@ -126,6 +125,47 @@ const typeOptions = [
       Swal.fire("ผิดพลาด", "บันทึกไม่สำเร็จ", "error");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedMenu) return;
+
+    const result = await Swal.fire({
+      title: "ยืนยันการลบ?",
+      html: `คุณต้องการลบเมนู <b>"${selectedMenu.name_menu}"</b> ใช่หรือไม่?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#EF4444",
+      cancelButtonColor: "#6B7280",
+      confirmButtonText: "ลบเมนู",
+      cancelButtonText: "ยกเลิก",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    setIsDeleting(true);
+
+    try {
+      await api.delete(`api/menu/${selectedMenu.id_menu}`);
+
+      setSelectedMenu(null);
+      await fetchMenu();
+
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "ลบเมนูสำเร็จ",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("ผิดพลาด", "ลบเมนูไม่สำเร็จ", "error");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -208,7 +248,6 @@ const typeOptions = [
                     <h2 className="text-lg font-black text-gray-900 leading-none">
                       แก้ไขข้อมูล
                     </h2>
-                    
                   </div>
                   <button
                     onClick={() => setSelectedMenu(null)}
@@ -251,7 +290,7 @@ const typeOptions = [
                     </div>
 
                     <div className="col-span-3 space-y-5">
-                      {/* ชื่ออา/ */}
+                      {/* ชื่ออาหาร */}
                       <div className="space-y-1">
                         <label className="text-[11px] font-black text-gray-400 uppercase ml-1">
                           ชื่อรายการอาหาร
@@ -278,7 +317,11 @@ const typeOptions = [
                                 setFormData({ ...formData, type: opt.value })
                               }
                               className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-2xl border-2 transition-all font-bold text-sm
-                              ${formData.type === opt.value? "border-blue-500 bg-blue-50 text-blue-600": "border-gray-200 bg-white text-gray-400 hover:border-gray-300"}`}
+                              ${
+                                formData.type === opt.value
+                                  ? "border-blue-500 bg-blue-50 text-blue-600"
+                                  : "border-gray-200 bg-white text-gray-400 hover:border-gray-300"
+                              }`}
                             >
                               <span className="text-xl">{opt.icon}</span>
                               <span className="text-[11px]">{opt.label}</span>
@@ -311,7 +354,15 @@ const typeOptions = [
                   </div>
                 </div>
 
-                <div className="p-4 border-t border-gray-100 flex justify-end items-center shrink-0 bg-white px-8">
+                <div className="p-4 border-t border-gray-100 flex justify-between items-center shrink-0 bg-white px-8">
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="px-6 py-3 bg-red-500 text-white rounded-2xl font-black shadow-lg hover:bg-red-600 disabled:bg-gray-300 transition-all flex items-center gap-2"
+                  >
+                    <FaTrash className="text-sm" />
+                    {isDeleting ? "กำลังลบ..." : "ลบเมนู"}
+                  </button>
                   <button
                     onClick={handleSave}
                     disabled={isSaving}

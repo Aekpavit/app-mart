@@ -418,8 +418,8 @@ export default function ShowMenu() {
 
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center py-24 text-gray-400">
-            <div className="text-6xl mb-4 opacity-20">🍽️</div>
-            <p className="font-bold text-gray-500">ไม่พบเมนูที่ค้นหา</p>
+            <div className="text-6xl mb-4 opacity-20 animate-bounce">?</div>
+            <p className="font-bold text-gray-500">ไม่พบเมนู</p>
             <button onClick={() => setSearch("")} className="mt-3 text-xs text-black hover:underline font-bold">
               ล้างการค้นหา
             </button>
