@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import Showmenu from "./pages/Showmenu";
 import MenuManager from "./pages/MenuManager";
 import AddMenu from "./pages/Addmenu";
-
+import Showemployee from "./pages/Showemployee"
 
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
       <Route path="/home" element={<Home/>} />
       <Route path="/menu" element={<MenuManager/>} />
       <Route path="/addmenu" element={<AddMenu/>} />
+      <Route path="/employee" element={<Showemployee/>} />
       
     </Routes>
   );

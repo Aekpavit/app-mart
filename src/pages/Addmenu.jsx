@@ -25,7 +25,7 @@ const CATEGORIES = [
   { value: "dessert", label: "ของหวาน",     icon: <LuDessert />,       bg: "bg-black" },
 ];
 
-// ─── New Loading Overlay Component ─────────────────────────────────────────────
+// ─── Loading Overlay Component ─────────────────────────────────────────────
 function LoadingOverlay() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
