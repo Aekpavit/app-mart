@@ -65,19 +65,33 @@ export default function EditEmployee() {
   const handleSave = async () => {
     if (!selectedEmp) return;
     setIsSaving(true);
-
+  
     try {
-      const data = new FormData();
-      data.append("f_name", formData.f_name);
-      data.append("l_name", formData.l_name);
-      data.append("salary", formData.salary);
-      data.append("role", formData.role);
-      if (formData.file) data.append("img", formData.file);
-
-      await api.put(`api/employee/${selectedEmp.id_em}`, data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
+      // ถ้ามีการอัปโหลดรูป → ใช้ FormData
+      if (formData.file) {
+        const data = new FormData();
+        data.append("f_name", formData.f_name);
+        data.append("l_name", formData.l_name);
+        data.append("salary", parseFloat(formData.salary)); // แปลงเป็น number
+        data.append("role", formData.role);
+        data.append("img", formData.file);
+  
+        await api.put(`api/employee/${selectedEmp.id_em}`, data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } 
+      // ถ้าไม่มีรูป → ส่ง JSON
+      else {
+        await api.put(`api/employee/${selectedEmp.id_em}`, {
+          f_name: formData.f_name,
+          l_name: formData.l_name,
+          salary: parseFloat(formData.salary), // แปลงเป็น number
+          role: formData.role,
+        }, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+  
       await fetchEmployees();
       setImgPreview(null);
       
@@ -90,13 +104,12 @@ export default function EditEmployee() {
         timer: 2000,
       });
     } catch (err) {
-      console.error(err);
-      Swal.fire("ผิดพลาด", "ไม่สามารถบันทึกข้อมูลได้", "error");
+      console.error("Error details:", err.response?.data); // ดูรายละเอียด error
+      Swal.fire("ผิดพลาด", err.response?.data?.message || "ไม่สามารถบันทึกข้อมูลได้", "error");
     } finally {
       setIsSaving(false);
     }
   };
-
   const handleDelete = async () => {
     if (!selectedEmp) return;
 
