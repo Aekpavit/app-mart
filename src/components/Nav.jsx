@@ -2,10 +2,10 @@ import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const menuItems = [
-    { name: "Dashboard", path: "/home" },
-    { name: "menu", path: "/showmenu" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
+    { name: "ภาพรวม", path: "/home" },
+    { name: "เมนู", path: "/showmenu" },
+    { name: "เทสๆ", path: "/about" },
+    { name: "พนักงาน", path: "/employee" },
   ];
 
   return (
